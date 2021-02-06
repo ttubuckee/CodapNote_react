@@ -1,4 +1,5 @@
 import Timer from './TimerImpl';
+import Swal from 'sweetalert2';
 
 interface UrlData {
   clockcolor: string;
@@ -22,31 +23,37 @@ const base_urls: { [key:string]: UrlData } = {
   "https://www.acmicpc.net/problem": {
       "clockcolor": "black",
       "url": "https://www.acmicpc.net/",
-      "titleselector": "#problemtitle",
+      "titleselector": "#problem_title",
       "navselector": ".page-header"
   }
 };
 type FormElements = HTMLElement | null;
 class FormGenerator {
-  private clock: FormElements;
-  private input_tag_h: FormElements;
-  private input_tag_m: FormElements;
-  private input_tag_s: FormElements;
-  private formTag: FormElements;
-  private starImg: FormElements;
-  private inputWrapper: FormElements;
-  private actionButton: FormElements;
+  private data: UrlData;
+  private top_nav: FormElements;
+  private clock: HTMLDivElement;
+  private input_tag_h: HTMLInputElement;
+  private input_tag_m: HTMLInputElement;
+  private input_tag_s: HTMLInputElement;
+  private input_arr: Array<HTMLElement>;
+  private formTag: HTMLFormElement;
+  private starImg: HTMLImageElement;
+  private inputWrapper: HTMLDivElement;
+  private actionButton: HTMLButtonElement;
   private timer: Timer;
   
   constructor(timer: Timer) {
-    this.clock = null;
-    this.input_tag_h = null;
-    this.input_tag_m = null;
-    this.input_tag_s = null;
-    this.formTag = null;
-    this.starImg = null;
-    this.inputWrapper = null;
-    this.actionButton = null;
+    this.data = this.getSiteData(location.href);
+    this.top_nav = null;
+    this.formTag = this.generateTag('timer-form','form') as HTMLFormElement;
+    this.inputWrapper = this.generateTag('input-wrapper','div') as HTMLDivElement;
+    this.starImg = this.generateTag('star-img','img') as HTMLImageElement;
+    this.input_tag_h = this.generateTag('input-h','input') as HTMLInputElement;
+    this.input_tag_m = this.generateTag('input-m','input') as HTMLInputElement;
+    this.input_tag_s = this.generateTag('input-s','input') as HTMLInputElement;
+    this.input_arr = [this.input_tag_h,this.input_tag_m,this.input_tag_s];
+    this.actionButton = this.generateTag('action-button','button') as HTMLButtonElement;
+    this.clock = this.generateTag('clock-div','div') as HTMLDivElement;
     this.timer = timer;
   }
   get getTimer () {
@@ -55,37 +62,30 @@ class FormGenerator {
   get getHourTag() {
     return this.input_tag_h;
   }
-  set setHourTag(val: FormElements) {
+  set setHourTag(val: HTMLInputElement) {
     this.input_tag_h = val;
   }
   get getMinuteTag() {
     return this.input_tag_m;
   }
-  set setMinuteTag(val: FormElements) {
+  set setMinuteTag(val: HTMLInputElement) {
     this.input_tag_m = val;
   }
   get getSecondTag() {
     return this.input_tag_s;
   }
-  set setSecondTag(val: FormElements) {
+  set setSecondTag(val: HTMLInputElement) {
     this.input_tag_s = val;
   }
-  init(): void{
-    const data = this.getSiteData(location.href);
-    const { clockcolor, url, titleselector, navselector } = data;
-    const targetDiv = document.querySelector(navselector);
-
-    // form 태그, input 태그, wrapper 생성
-    this.formTag = this.generateTag('timer-form','form');
-    this.inputWrapper = this.generateTag('input-wrapper','div');
-    this.starImg = this.generateTag('star-img','img');
-    this.input_tag_h = this.generateTag('input-h','input');
-    this.input_tag_m = this.generateTag('input-m','input');
-    this.input_tag_s = this.generateTag('input-s','input');
-    this.actionButton = this.generateTag('action-button','button');
-    this.clock = this.generateTag('clock-div','div');
-    
+  init() {
+    this.appendTags();
+    this.setTagStyles();
+    this.setEventListener();
+    this.setMutation();
+  }
+  private appendTags(): void{
     // appendchild
+    const targetDiv = document.querySelector(this.data.navselector);
     targetDiv?.append(this.clock);
     targetDiv?.appendChild(this.formTag);
     this.formTag.appendChild(this.inputWrapper);
@@ -94,7 +94,9 @@ class FormGenerator {
     this.inputWrapper.appendChild(this.input_tag_m);
     this.inputWrapper.appendChild(this.input_tag_s);
     this.inputWrapper.appendChild(this.actionButton);
-
+  }
+  private setTagStyles(): void{
+    const { clockcolor, url, titleselector, navselector } = this.data;
     // set specific attributes
     this.input_tag_h.setAttribute('placeholder', '시간');
     this.input_tag_m.setAttribute('placeholder', '분');
@@ -126,9 +128,97 @@ class FormGenerator {
     this.actionButton.style.border = "2px solid #0078FF";
     this.actionButton.style.borderRadius = '3px'; // standard
     // this.actionButton.style.MozBorderRadius = '3px'; // Mozilla
+
+    this.input_arr.forEach(e=>{
+      e.style.borderRadius = '3px';
+      e.setAttribute('size', '4');
+      e.style.padding = '5px';
+    });
   }
-  
-  private generateTag(id: string,type: string): HTMLElement{
+  private setMutation(): void{
+    if(this.data["url"] === "https://www.hackerrank.com/"){ // 특정 위치에 원소 삽입
+        const mutation = new MutationObserver(()=>{
+            this.top_nav = document.querySelector(this.data['navselector']);
+            if (this.top_nav) {
+                this.top_nav.appendChild(this.inputWrapper);
+                this.input_tag_h.focus();
+                this.isFavor().then(result=> this.checkStar(result));
+                // this.checkStar(this.isFavor());
+                mutation.disconnect();
+            } else {
+                console.log('시도중...');
+            }
+        });
+        mutation.observe(document.getElementsByClassName('.hr-monaco-editor-wrapper')[0],{childList:true});
+    }else {
+        this.top_nav = document.querySelector(this.data['navselector']);
+        this.top_nav!.appendChild(this.inputWrapper);
+        this.input_tag_h.focus();
+        this.isFavor().then(result=> this.checkStar(result));
+    }
+  }
+  private setEventListener(): void{
+    this.starImg.addEventListener("click", () => {
+      const url = window.location.href;
+      const title = document.querySelector(this.data.titleselector)!.textContent;
+
+      if (this.starImg.alt === "unstar") {
+          this.starImg.alt = "star";
+          this.starImg.src = chrome.runtime.getURL("img/Star.png?time=") + new Date().getTime();
+          // addUnsolvedQuestions(title, url);
+      } else {
+          this.starImg.alt = "unstar";
+          this.starImg.src = chrome.runtime.getURL("img/unStar.png?time=") + new Date().getTime();
+          // remove from list
+          // removeUnStaredQuestion(title);
+      }
+    });
+    this.actionButton.addEventListener("click", () => {
+      if(this.validation()){
+        this.hideInputForms();
+        this.timer.start();  
+      } else {
+        
+      }
+    });
+  }
+  private validation(): boolean{
+      return this.input_arr.reduce((acc, cur) => acc && (this.isNumber((cur as HTMLInputElement).value) || (cur as HTMLInputElement).value === "")
+      , this.isNumber((this.input_arr[0] as HTMLInputElement).value));
+  }
+  private isNumber(num: string): boolean{
+    const regex = /^[0-9]+$/;
+    return regex.test(num);
+  }
+  private hideInputForms(): void{
+
+  }
+  private checkStar(check: boolean): void{
+    if (check) {
+        // 별을 색칠
+        this.starImg.alt = "star";
+        this.starImg.src = chrome.runtime.getURL("img/Star.png?time=") + new Date().getTime();
+    } else {
+        // 별을 빈칸으로
+        this.starImg.alt = "unstar";
+        this.starImg.src = chrome.runtime.getURL("img/unStar.png?time=") + new Date().getTime();
+    }
+  }
+  private isFavor(): Promise<boolean>{
+    return new Promise(resolve => {
+      if(document.querySelector(this.data.titleselector) == null){
+        const title = document.querySelector(this.data.titleselector)!.textContent;
+
+        chrome.storage.sync.get(null, function (items) {
+          const keys = Object.keys(items);
+          keys.includes(title!) ? resolve(true) : resolve(false);
+        });
+      } else {
+        throw new Error('no titleSelector');
+      }
+    });
+  }
+  private generateTag(id: string,type: string): HTMLElement{ 
     const tag = document.createElement(type);
     tag.setAttribute('id',id);
     return tag;
