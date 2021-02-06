@@ -27,6 +27,14 @@ const base_urls: { [key:string]: UrlData } = {
       "navselector": ".page-header"
   }
 };
+const swalWithBootstrapButtons = Swal.mixin({
+  customClass: {
+    confirmButton: 'btn btn-success',
+    cancelButton: 'btn btn-danger'
+  },
+  buttonsStyling: false
+});
+
 type FormElements = HTMLElement | null;
 class FormGenerator {
   private data: UrlData;
@@ -173,14 +181,56 @@ class FormGenerator {
           // removeUnStaredQuestion(title);
       }
     });
-    this.actionButton.addEventListener("click", () => {
-      if(this.validation()){
-        this.hideInputForms();
-        this.timer.start();  
-      } else {
-        
+    this.actionButton.addEventListener("click", (e) => {
+      if((e.target as HTMLButtonElement).innerText === '시작'){
+        if(this.validation()){
+          this.hideInputForms();
+          this.actionButton.innerText = '중지';
+          this.timer.start();  
+        } else { // 비정상적 값이 입력된 경우
+          Swal.fire({
+            icon: 'error',
+            title: '앗!',
+            text: '정상적인 값을 입력해주세요',
+          });
+        }
+      } else { // 중지
+        swalWithBootstrapButtons.fire({
+          title: "타이머가 실행중입니다.\n초기화 하시겠습니까?",
+          text: "'예' 를 누르시면 타이머가 초기화 됩니다.",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: '예',
+          cancelButtonText: '아니요',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            swalWithBootstrapButtons.fire(
+              '초기화 됨',
+              '타이머가 초기화 되었습니다!',
+              'success'
+            )
+          }
+        })
+      //   swal({
+      //     title: "타이머가 실행중입니다.\n초기화 하시겠습니까?",
+      //     text: "'예' 를 누르시면 타이머가 초기화 됩니다.",
+      //     icon: "warning",
+      //     buttons: ["아니오", "예"],
+      //     dangerMode: true
+      // }).then((willDelete) => {
+      //     if (willDelete) {
+      //         timer.stop();
+      //         action_btn.innerHTML = "시작";
+      //     }
+      // });
       }
     });
+  }
+  private resetInput(): void{
+    this.input_tag_h.innerText = '';
+    this.input_tag_m.innerText = '';
+    this.input_tag_s.innerText = '';
   }
   private validation(): boolean{
       return this.input_arr.reduce((acc, cur) => acc && (this.isNumber((cur as HTMLInputElement).value) || (cur as HTMLInputElement).value === "")
@@ -191,7 +241,20 @@ class FormGenerator {
     return regex.test(num);
   }
   private hideInputForms(): void{
-
+    this.input_tag_h.style.display = 'none';
+    this.input_tag_m.style.display = 'none';
+    this.input_tag_s.style.display = 'none';
+  }
+  private showInputForm(): void{
+    this.input_tag_h.style.display = 'block';
+    this.input_tag_m.style.display = 'block';
+    this.input_tag_s.style.display = 'block';
+  }
+  private hideClock(): void{
+    this.clock.style.display = 'none';
+  }
+  private showClock(): void{
+    this.clock.style.display = 'block';
   }
   private checkStar(check: boolean): void{
     if (check) {
@@ -206,7 +269,7 @@ class FormGenerator {
   }
   private isFavor(): Promise<boolean>{
     return new Promise(resolve => {
-      if(document.querySelector(this.data.titleselector) == null){
+      if(document.querySelector(this.data.titleselector) !== null){
         const title = document.querySelector(this.data.titleselector)!.textContent;
 
         chrome.storage.sync.get(null, function (items) {
