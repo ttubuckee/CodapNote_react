@@ -81,6 +81,12 @@ class TimerImpl implements Timer {
     if (this.remainTime < 0) {
         // notify();
         this.stop();
+
+        (document.getElementById('action-button') as HTMLButtonElement).innerText = "시작";
+        (document.getElementById('input-h') as HTMLInputElement).style.display = 'block';
+        (document.getElementById('input-m') as HTMLInputElement).style.display = 'block';
+        (document.getElementById('input-s') as HTMLInputElement).style.display = 'block';
+
         if (Notification.permission === 'granted') {
             Swal.fire({
               icon: 'success',
@@ -101,9 +107,7 @@ class TimerImpl implements Timer {
               closeButtonHtml: '확인'
             }).then((result)=>{
               if(result.isConfirmed) {
-                (document.getElementById('input_tag_h') as HTMLInputElement).style.display = 'block';
-                (document.getElementById('input_tag_m') as HTMLInputElement).style.display = 'block';
-                (document.getElementById('input_tag_s') as HTMLInputElement).style.display = 'block';
+                
               } else {
                 // requestPermission();
               }
@@ -117,7 +121,6 @@ class TimerImpl implements Timer {
 
   }
   stop() {
-    (document.getElementById('action-button') as HTMLButtonElement).innerText = "시작";
     clearInterval(this.interval as NodeJS.Timeout);
     this.clock!.innerText = '';
   }
