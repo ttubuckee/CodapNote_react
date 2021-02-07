@@ -115,7 +115,7 @@ class TimerImpl implements Timer {
 
   }
   stop() {
-    this.clock!.innerText = "시작";
+    (document.getElementById('action-button') as HTMLButtonElement).innerText = "시작";
     clearInterval(this.interval as NodeJS.Timeout);
   }
 }
