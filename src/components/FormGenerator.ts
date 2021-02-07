@@ -28,6 +28,13 @@ const base_urls: { [key:string]: UrlData } = {
       "navselector": ".page-header"
   }
 };
+const swalWithBootstrapButtons = Swal.mixin({
+  customClass: {
+    confirmButton: 'btn btn-success',
+    cancelButton: 'btn btn-danger'
+  },
+  buttonsStyling: false
+});
 
 type FormElements = HTMLElement | null;
 class FormGenerator {
@@ -204,8 +211,9 @@ class FormGenerator {
           title: "타이머가 실행중입니다.",
           showDenyButton: true,
           showCancelButton: true,
+          cancelButtonText: '취소',
           confirmButtonText: '일지정지',
-          denyButtonText: '초기화'
+          denyButtonText: '초기화',
         }).then((result)=>{
           if(result.isConfirmed) {
             this.timer.pause();
