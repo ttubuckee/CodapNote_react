@@ -1,5 +1,5 @@
-import Timer from './TimerImpl';
 import Swal from 'sweetalert2';
+import TimerImpl from './TimerImpl';
 
 interface UrlData {
   clockcolor: string;
@@ -44,16 +44,14 @@ class FormGenerator {
   private input_tag_m: HTMLInputElement;
   private input_tag_s: HTMLInputElement;
   private input_arr: Array<HTMLElement>;
-  private formTag: HTMLFormElement;
   private starImg: HTMLImageElement;
   private inputWrapper: HTMLDivElement;
   private actionButton: HTMLButtonElement;
-  private timer: Timer;
+  private timer: TimerImpl;
   
-  constructor(timer: Timer) {
+  constructor(timer: TimerImpl) {
     this.data = this.getSiteData(location.href);
     this.top_nav = null;
-    this.formTag = this.generateTag('timer-form','form') as HTMLFormElement;
     this.inputWrapper = this.generateTag('input-wrapper','div') as HTMLDivElement;
     this.starImg = this.generateTag('star-img','img') as HTMLImageElement;
     this.input_tag_h = this.generateTag('input-h','input') as HTMLInputElement;
@@ -94,13 +92,13 @@ class FormGenerator {
   private appendTags(): void{
     // appendchild
     const targetDiv = document.querySelector(this.data.navselector);
-    targetDiv?.append(this.clock);
-    targetDiv?.appendChild(this.formTag);
-    this.formTag.appendChild(this.inputWrapper);
+    // targetDiv?.append(this.clock);
+    targetDiv?.appendChild(this.inputWrapper);
     this.inputWrapper.appendChild(this.starImg);
     this.inputWrapper.appendChild(this.input_tag_h);
     this.inputWrapper.appendChild(this.input_tag_m);
     this.inputWrapper.appendChild(this.input_tag_s);
+    this.inputWrapper.appendChild(this.clock);
     this.inputWrapper.appendChild(this.actionButton);
   }
   private setTagStyles(): void{
@@ -166,6 +164,7 @@ class FormGenerator {
     }
   }
   private setEventListener(): void{
+    // starImg event
     this.starImg.addEventListener("click", () => {
       const url = window.location.href;
       const title = document.querySelector(this.data.titleselector)!.textContent;
@@ -181,12 +180,21 @@ class FormGenerator {
           // removeUnStaredQuestion(title);
       }
     });
+    // actionButton event
     this.actionButton.addEventListener("click", (e) => {
       if((e.target as HTMLButtonElement).innerText === '시작'){
         if(this.validation()){
           this.hideInputForms();
+          this.showClock();
           this.actionButton.innerText = '중지';
-          this.timer.start();  
+
+          const h = parseInt(this.input_tag_h.value);
+          const m = parseInt(this.input_tag_m.value);
+          const s = parseInt(this.input_tag_s.value);
+
+          this.timer.setTime(h,m,s);
+          this.timer.start();
+          this.resetInput(); 
         } else { // 비정상적 값이 입력된 경우
           Swal.fire({
             icon: 'error',
@@ -210,31 +218,31 @@ class FormGenerator {
               '타이머가 초기화 되었습니다!',
               'success'
             )
+            this.timer.stop();
+            this.resetInput();
+            this.hideClock();
+            this.showInputForm();
+            this.actionButton.innerText = '시작';
+            this.input_tag_h.focus();
           }
-        })
-      //   swal({
-      //     title: "타이머가 실행중입니다.\n초기화 하시겠습니까?",
-      //     text: "'예' 를 누르시면 타이머가 초기화 됩니다.",
-      //     icon: "warning",
-      //     buttons: ["아니오", "예"],
-      //     dangerMode: true
-      // }).then((willDelete) => {
-      //     if (willDelete) {
-      //         timer.stop();
-      //         action_btn.innerHTML = "시작";
-      //     }
-      // });
+        });
       }
+    });
+    // input event
+    this.input_arr.forEach(input => {
+      input.addEventListener('keyup',(e: KeyboardEvent)=>{
+        if(e.code == 'Enter') this.actionButton.click();
+      });
     });
   }
   private resetInput(): void{
-    this.input_tag_h.innerText = '';
-    this.input_tag_m.innerText = '';
-    this.input_tag_s.innerText = '';
+    this.input_tag_h.value = '';
+    this.input_tag_m.value = '';
+    this.input_tag_s.value = '';
   }
   private validation(): boolean{
       return this.input_arr.reduce((acc, cur) => acc && (this.isNumber((cur as HTMLInputElement).value) || (cur as HTMLInputElement).value === "")
-      , this.isNumber((this.input_arr[0] as HTMLInputElement).value));
+      , this.isNumber((this.input_arr[0] as HTMLInputElement).value) || (this.input_arr[0] as HTMLInputElement).value === '');
   }
   private isNumber(num: string): boolean{
     const regex = /^[0-9]+$/;

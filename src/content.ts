@@ -9,7 +9,6 @@ console.log('content.ts loaded');
 const timer = new TimerImpl();
 const formGenerator = new FormGenerator(timer);
 formGenerator.init();
-console.log('실행됨');
 // window.addEventListener('DOMContentLoaded',function(){
 // 왜 여기서 제어가 안되지?
 // });
