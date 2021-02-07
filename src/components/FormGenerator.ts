@@ -28,13 +28,6 @@ const base_urls: { [key:string]: UrlData } = {
       "navselector": ".page-header"
   }
 };
-const swalWithBootstrapButtons = Swal.mixin({
-  customClass: {
-    confirmButton: 'btn btn-success',
-    cancelButton: 'btn btn-danger'
-  },
-  buttonsStyling: false
-});
 
 type FormElements = HTMLElement | null;
 class FormGenerator {
@@ -194,7 +187,7 @@ class FormGenerator {
           const s = parseInt(this.input_tag_s.value);
 
           this.timer.setTime(h,m,s);
-          this.timer.start();
+          this.timer.start(false);
           this.resetInput(); 
         } else { // 비정상적 값이 입력된 경우
           Swal.fire({
@@ -203,17 +196,21 @@ class FormGenerator {
             text: '정상적인 값을 입력해주세요',
           });
         }
+      } else if((e.target as HTMLButtonElement).innerText === '재개') {
+        this.timer.start(true);
+        this.actionButton.innerText = '중지';
       } else { // 중지
-        swalWithBootstrapButtons.fire({
-          title: "타이머가 실행중입니다.\n초기화 하시겠습니까?",
-          text: "'예' 를 누르시면 타이머가 초기화 됩니다.",
-          icon: "warning",
+        Swal.fire({
+          title: "타이머가 실행중입니다.",
+          showDenyButton: true,
           showCancelButton: true,
-          confirmButtonText: '예',
-          cancelButtonText: '아니요',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
+          confirmButtonText: '일지정지',
+          denyButtonText: '초기화'
+        }).then((result)=>{
+          if(result.isConfirmed) {
+            this.timer.pause();
+            this.actionButton.innerText = '재개';
+          } else if (result.isDenied) {
             swalWithBootstrapButtons.fire(
               '초기화 됨',
               '타이머가 초기화 되었습니다!',
@@ -226,7 +223,7 @@ class FormGenerator {
             this.actionButton.innerText = '시작';
             this.input_tag_h.focus();
           }
-        });
+        }); 
       }
     });
     // input event

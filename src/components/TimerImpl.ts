@@ -1,7 +1,7 @@
 import Swal from 'sweetalert2';
 
 interface Timer {
-  start(): void;
+  start(resume: boolean): void;
   stop(): void;
   pause(): void;
   setTime(): void;
@@ -57,16 +57,20 @@ class TimerImpl implements Timer {
     this._minutes = m ? m : 0;
     this._seconds = s ? s : 0;
   }
-  start() {
-    this.clock = document.getElementById('clock-div') as HTMLDivElement;
-    this.start_time = new Date();
-    this.end_time = new Date(this.start_time);
-    this.end_time.setHours(this.end_time.getHours() + this.hours);
-    this.end_time.setMinutes(this.end_time.getMinutes() + this.minutes);
-    this.end_time.setSeconds(this.end_time.getSeconds() + this.seconds);
-    this.remainTime = this.end_time.getTime() - this.start_time.getTime();
+  start(resume: boolean) {
+    if(resume) {
+      this.interval = setInterval(this.updateClock.bind(this), TimerImpl.ONE_SECOND);
+    } else {
+      this.clock = document.getElementById('clock-div') as HTMLDivElement;
+      this.start_time = new Date();
+      this.end_time = new Date(this.start_time);
+      this.end_time.setHours(this.end_time.getHours() + this.hours);
+      this.end_time.setMinutes(this.end_time.getMinutes() + this.minutes);
+      this.end_time.setSeconds(this.end_time.getSeconds() + this.seconds);
+      this.remainTime = this.end_time.getTime() - this.start_time.getTime();
 
-    this.interval = setInterval(this.updateClock.bind(this), TimerImpl.ONE_SECOND);
+      this.interval = setInterval(this.updateClock.bind(this), TimerImpl.ONE_SECOND);
+    }
   }
   updateClock () {
     let remain_hours: number = Math.floor((this.remainTime % (TimerImpl.ONE_SECOND * 60 * 60 * 24)) / (TimerImpl.ONE_SECOND  * 60 * 60));
@@ -118,7 +122,7 @@ class TimerImpl implements Timer {
     }
   }
   pause() {
-
+    clearInterval(this.interval as NodeJS.Timeout);
   }
   stop() {
     clearInterval(this.interval as NodeJS.Timeout);
