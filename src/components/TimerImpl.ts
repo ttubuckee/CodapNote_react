@@ -101,7 +101,9 @@ class TimerImpl implements Timer {
               closeButtonHtml: '확인'
             }).then((result)=>{
               if(result.isConfirmed) {
-                
+                (document.getElementById('input_tag_h') as HTMLInputElement).style.display = 'block';
+                (document.getElementById('input_tag_m') as HTMLInputElement).style.display = 'block';
+                (document.getElementById('input_tag_s') as HTMLInputElement).style.display = 'block';
               } else {
                 // requestPermission();
               }
@@ -117,6 +119,7 @@ class TimerImpl implements Timer {
   stop() {
     (document.getElementById('action-button') as HTMLButtonElement).innerText = "시작";
     clearInterval(this.interval as NodeJS.Timeout);
+    this.clock!.innerText = '';
   }
 }
 
