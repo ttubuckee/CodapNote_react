@@ -18,7 +18,7 @@ const base_urls: { [key:string]: UrlData } = {
   "https://www.hackerrank.com/": {
       "clockcolor": "black",
       "url": "https://www.hackerrank.com/",
-      "titleselector": "#content > div > div > div > header > div > div > div.community-header-breadcrumb-items > div > h1 > div > h1",
+      "titleselector": "#content > div > div > div > div > header > div > div > div.community-header-breadcrumb-items > div > h1 > div > h1",
       "navselector": ".toolbar-left"
   },
   "https://www.acmicpc.net/problem": {
@@ -144,19 +144,30 @@ class FormGenerator {
   }
   private setMutation(): void{
     if(this.data["url"] === "https://www.hackerrank.com/"){ // 특정 위치에 원소 삽입
-        const mutation = new MutationObserver(()=>{
-            this.top_nav = document.querySelector(this.data['navselector']);
-            if (this.top_nav) {
-                this.top_nav.appendChild(this.inputWrapper);
-                this.input_tag_h.focus();
-                this.isFavor().then(result=> this.checkStar(result));
-                // this.checkStar(this.isFavor());
-                mutation.disconnect();
-            } else {
-                console.log('시도중...');
-            }
-        });
-        mutation.observe(document.getElementsByClassName('.hr-monaco-editor-wrapper')[0],{childList:true});
+        const interval = setInterval(()=>{
+          this.top_nav = document.querySelector(this.data.navselector);
+          if(this.top_nav) {
+            this.top_nav.appendChild(this.inputWrapper);
+            this.input_tag_h.focus();
+            this.isFavor().then(result=> this.checkStar(result));
+            clearInterval(interval);
+          } else {
+            console.log('시도중...');
+          }
+        },1000); 
+        // const mutation = new MutationObserver(()=>{
+        //     this.top_nav = document.querySelector(this.data['navselector']);
+        //     if (this.top_nav) {
+        //         this.top_nav.appendChild(this.inputWrapper);
+        //         this.input_tag_h.focus();
+        //         this.isFavor().then(result=> this.checkStar(result));
+        //         // this.checkStar(this.isFavor());
+        //         mutation.disconnect();
+        //     } else {
+        //         console.log('시도중...');
+        //     }
+        // });
+        // mutation.observe(document.querySelectorAll('.hr-monaco-editor-wrapper')[0],{childList:true});
     }else {
         this.top_nav = document.querySelector(this.data['navselector']);
         this.top_nav!.appendChild(this.inputWrapper);
@@ -248,7 +259,7 @@ class FormGenerator {
             this.timer.pause();
             this.actionButton.innerText = '재개';
           } else if (result.isDenied) {
-            swalWithBootstrapButtons.fire(
+            Swal.fire(
               '초기화 됨',
               '타이머가 초기화 되었습니다!',
               'success'

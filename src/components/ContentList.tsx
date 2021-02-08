@@ -55,24 +55,48 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
       setCount(count-1);
     }
   }
-  const selectAll = () => {
+  const selectAll = () => { 
     const btn = document.getElementById("select-all-btn") as HTMLButtonElement;
-    const check_item = document.querySelectorAll('.check-item') as NodeListOf<HTMLInputElement>;
+    const check_item = document.querySelectorAll('.check-item');
 
     if (isAllSelected) {
       btn.innerHTML = "모두 선택";
-      check_item.forEach(e => e.checked = false);
+      check_item.forEach(e => (e as HTMLInputElement).checked = false);
       setCount(0);
       setIsAllSelected(false);
     } else {
       btn.innerHTML = "모두 해제";
-      check_item.forEach(e => e.checked = true);
+      check_item.forEach(e => (e as HTMLInputElement).checked = true);
       setCount(document.getElementById('unsolved-list')!.children.length);
       setIsAllSelected(true);
       
     }
   }
-  const deleteCheckedList = () => {
+//   function deleteCheckedList() {
+//     const result = confirm("선택 목록을 삭제하시겠습니까?");
+
+//     if (result) {
+//         const ul = document.getElementById("ul-question-list");
+//         const li_list = ul.children;
+//         const delete_list = [];
+//         const ul_delete_list = [];
+
+//         for (let i = 0; i < li_list.length; i++) { // remove 되면서 index가 하나씩 떨어졌고, 그래서 length가 3인 상황에서도 2개밖에 못 지웠던 것이다.
+//             if (li_list[i].firstChild.checked) {
+//                 delete_list.push(li_list[i].lastChild.textContent.split('] ')[1]);
+//                 ul_delete_list.push(i);
+//             }
+//         }
+//         deleteLi(ul_delete_list);
+//         chrome.storage.sync.remove(delete_list, function () {
+//             alert('삭제되었습니다.');
+//         });
+//     } else {
+//         alert("취소 되었습니다.");
+//     }
+// }
+  const deleteCheckedList = () => { // children이 HTMLCollection을 반환해서 forEach 사용 불가. HTMLCollection은 유사 객체 배열임을 이용해서 각 Element 순회
+
     const result = confirm("선택 목록을 삭제하시겠습니까?");
 
     if (result) {
@@ -87,6 +111,7 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
           ul_delete_list.push(`${i}`);
         }
       }
+      
       deleteLi(ul_delete_list);
       chrome.storage.sync.remove(delete_list, function () {
         alert('삭제되었습니다.');
@@ -95,15 +120,18 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
       alert("취소 되었습니다.");
     }
   }
-  const deleteLi = (arr: string[]) => {
-    const ul = document.getElementById("unsolved-list") as HTMLElement;
-    let li = document.getElementsByClassName("li-question");
+  const deleteLi = (arr: string[]) => { // 여기서 오류 발생!
+    const ul = document.getElementById("unsolved-list") as HTMLUListElement;
+    const li = document.getElementsByClassName("li-question");
 
     for (let i = 0; i < arr.length; ++i) {
-      if (arr.includes(li[i].getAttribute("value")!)) {
+      // console.log(li[i].getAttribute('value'));
+      if (arr.includes(li[i].getAttribute("value")!)) { // 하나씩 밀린다.
         ul.removeChild(li[i]);
       }
     }
+    setCount(0);
+    setIsAllSelected(false); // 이렇게 되면 오류날 것 같은데?
     location.reload();
   }
   return (
