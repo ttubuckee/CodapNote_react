@@ -7,7 +7,7 @@ import "./App.css";
 
 // const siteList = ['백준','프로그래머스','해커랭크'];
 const siteList = {
-  "백준":"https://www.acmicpc.net/",
+  "백 준":"https://www.acmicpc.net/",
   "프로그래머스":"https://programmers.co.kr/",
   "해커랭크":"https://www.hackerrank.com/"
 };
