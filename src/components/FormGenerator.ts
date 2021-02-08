@@ -164,6 +164,35 @@ class FormGenerator {
         this.isFavor().then(result=> this.checkStar(result));
     }
   }
+  
+  private addUnsolvedQuestions(key: string, value: string) {
+    // const item = {key: value};  // 추가할 항목들
+    const item: any = {};
+    item[key] = value;
+    chrome.storage.sync.get(null, function (items) {
+      const keys = Object.keys(items);
+      if (!keys.includes(key)) {
+        chrome.storage.sync.set(item, function () {
+          
+        });
+      }
+    });
+  }
+  // function addUnsolvedQuestions(key, value) {
+  //   let item = {};  // 추가할 항목들
+  //   item[key] = value;
+  //   chrome.storage.sync.get(null, function (items) {
+  //       const keys = Object.keys(items);
+  //       if (!keys.includes(key)) {
+  //           chrome.storage.sync.set(item, function () {
+
+  //           });
+  //       }
+  //   });
+  // }
+  private removeUnStaredQuestion(title: string) {
+    chrome.storage.sync.remove(title);
+  }
   private setEventListener(): void{
     // starImg event
     this.starImg.addEventListener("click", () => {
@@ -173,12 +202,12 @@ class FormGenerator {
       if (this.starImg.alt === "unstar") {
           this.starImg.alt = "star";
           this.starImg.src = chrome.runtime.getURL("img/Star.png?time=") + new Date().getTime();
-          // addUnsolvedQuestions(title, url);
+          this.addUnsolvedQuestions(title!, url);
       } else {
           this.starImg.alt = "unstar";
           this.starImg.src = chrome.runtime.getURL("img/unStar.png?time=") + new Date().getTime();
           // remove from list
-          // removeUnStaredQuestion(title);
+          this.removeUnStaredQuestion(title!);
       }
     });
     // actionButton event
