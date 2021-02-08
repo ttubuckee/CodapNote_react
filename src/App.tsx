@@ -5,12 +5,12 @@ import NavBar from './components/NavBar';
 import ContentList from './components/ContentList';
 import "./App.css";
 
-const siteList = ['백준','프로그래머스','해커랭크'];
-// const base_urls = {
-//   "백준":"https://www.acmicpc.net/",
-//   "프로그래머스":"https://programmers.co.kr/",
-//   "해커랭크":"https://www.hackerrank.com/"
-// };
+// const siteList = ['백준','프로그래머스','해커랭크'];
+const siteList = {
+  "백준":"https://www.acmicpc.net/",
+  "프로그래머스":"https://programmers.co.kr/",
+  "해커랭크":"https://www.hackerrank.com/"
+};
 const App = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const onClickTabHandler = (index: number) => {
@@ -23,7 +23,7 @@ const App = () => {
     <div className="App">
       <SettingHeader text={'setting'}/>
       <NavBar list={siteList} onClickTabHandler={onClickTabHandler}/>
-      <ContentList id='content-div' currentTab={currentTab}/>
+      <ContentList id='content-div' currentTab={currentTab} siteList={siteList}/>
     </div>
   );
 };

@@ -4,8 +4,6 @@ import TimerImpl from './components/TimerImpl';
 // 폼 데이터 삽입
 // 데이터 popup.html에 리스트 추가
 // 즐겨찾기
-console.log('content.ts loaded');
-
 const timer = new TimerImpl();
 const formGenerator = new FormGenerator(timer);
 formGenerator.init();
