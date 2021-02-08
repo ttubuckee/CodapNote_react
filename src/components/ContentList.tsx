@@ -17,11 +17,8 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
   const [isAllSelected,setIsAllSelected] = useState(false);
 
   useEffect(()=>{
-    updateList();
-    setCount(0);
-    setIsAllSelected(false);
-    (document.getElementById("select-all-btn") as HTMLButtonElement).innerHTML = "모두 선택";
-    console.log('호출됨');
+    reset();
+    // console.log('호출됨');
   },[currentTab]);
   const updateList = () => { // chrome storage 조회
     const urls = Object.keys(siteList);
@@ -32,6 +29,13 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
         case 2: addRow(siteList[urls[2]],data); break;
       }
     });
+  }
+  const reset = () => {
+    updateList();
+    setCount(0);
+    setIsAllSelected(false);
+    (document.getElementById("select-all-btn") as HTMLButtonElement).innerHTML = "모두 선택";
+    document.querySelectorAll('.check-item').forEach(e => (e as HTMLInputElement).checked = false);
   }
   const addRow = (compareUrl: string, data: any) => {
     let idx = -1;
