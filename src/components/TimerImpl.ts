@@ -72,6 +72,17 @@ class TimerImpl implements Timer {
       this.interval = setInterval(this.updateClock.bind(this), TimerImpl.ONE_SECOND);
     }
   }
+  requestPermission() {
+    if (window.Notification) {
+        Notification.requestPermission();
+    }
+  }
+  notify() {
+    const notification = new Notification('시간 종료 알림', {
+        icon: chrome.extension.getURL("/img/timer_icon.png"),
+        body: '정해진 시간이 되어 알람이 종료되었습니다.',
+    });
+  }
   updateClock () {
     let remain_hours: number = Math.floor((this.remainTime % (TimerImpl.ONE_SECOND * 60 * 60 * 24)) / (TimerImpl.ONE_SECOND  * 60 * 60));
     let remain_minutes: number = Math.floor((this.remainTime % (TimerImpl.ONE_SECOND  * 60 * 60)) / (TimerImpl.ONE_SECOND  * 60));
@@ -83,7 +94,7 @@ class TimerImpl implements Timer {
     + (remain_seconds < 10 ? '0' + remain_seconds.toString() : remain_seconds.toString());
 
     if (this.remainTime < 0) {
-        // notify();
+
         this.stop();
 
         (document.getElementById('action-button') as HTMLButtonElement).innerText = "시작";
@@ -92,6 +103,7 @@ class TimerImpl implements Timer {
         (document.getElementById('input-s') as HTMLInputElement).style.display = 'block';
 
         if (Notification.permission === 'granted') {
+            this.notify();
             Swal.fire({
               icon: 'success',
               title: '종료!',
@@ -113,7 +125,7 @@ class TimerImpl implements Timer {
               if(result.isConfirmed) {
                 
               } else {
-                // requestPermission();
+                this.requestPermission();
               }
             });
         }

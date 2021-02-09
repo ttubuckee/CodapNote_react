@@ -89,6 +89,7 @@ class FormGenerator {
     this.setTagStyles();
     this.setEventListener();
     this.setMutation();
+    this.timer.requestPermission();
   }
   private appendTags(): void{
     // appendchild

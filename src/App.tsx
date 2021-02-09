@@ -1,5 +1,4 @@
 import React, {useState,useEffect} from "react";
-// import logo from "./logo.svg";
 import SettingHeader from './components/SettingHeader';
 import NavBar from './components/NavBar';
 import ContentList from './components/ContentList';
