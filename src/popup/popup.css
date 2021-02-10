@@ -23,6 +23,7 @@ html, body {
   justify-content: flex-end;
   font-weight: bold;
   color: white;
+  white-space: pre;
 }
 #navBar {
   width: 85%;
