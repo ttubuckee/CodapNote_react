@@ -4,15 +4,12 @@
   "manifest_version": 2,
   "version": "0.0.4",
   "icons": {
-    "16": "icon16.png",
-    "48": "icon48.png",
-    "128": "icon128.png"
+    "16": "img/timer_icon.png",
+    "48": "img/timer_icon.png",
+    "128": "img/timer_icon.png"
   },
   "browser_action": {
-    "default_icon": {
-      "16": "icon16.png",
-      "48": "icon48.png"
-    },
+    "default_icon": "img/timer_icon.png",
     "default_popup": "popup.html"
   },
   "web_accessible_resources": [
@@ -20,7 +17,8 @@
   ],
   "permissions": [
     "storage",
-    "notifications"
+    "notifications",
+    "tabs"
   ],
   "background": {
     "scripts": [
@@ -28,13 +26,16 @@
     ],
     "persistent": false
   },
-  "options_page" : "options.html",
   "content_scripts": [
     {
-      "matches": ["https://programmers.co.kr/learn/courses/30/lessons/*","https://www.hackerrank.com/challenges/*","https://www.acmicpc.net/problem/*"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle",
       "js": [
         "content.js"
       ]
     }
-  ]
+  ],
+  "chrome_url_overrides": {
+    "newtab": "page.html"
+  }
 }

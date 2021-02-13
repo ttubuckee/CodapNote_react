@@ -1,5 +1,6 @@
-import Timer from './TimerImpl';
 import Swal from 'sweetalert2';
+// import 'sweetalert2/dist/sweetalert2.min';
+import TimerImpl from './TimerImpl';
 
 interface UrlData {
   clockcolor: string;
@@ -17,7 +18,7 @@ const base_urls: { [key:string]: UrlData } = {
   "https://www.hackerrank.com/": {
       "clockcolor": "black",
       "url": "https://www.hackerrank.com/",
-      "titleselector": "#content > div > div > div > header > div > div > div.community-header-breadcrumb-items > div > h1 > div > h1",
+      "titleselector": "#content > div > div > div > div > header > div > div > div.community-header-breadcrumb-items > div > h1 > div > h1",
       "navselector": ".toolbar-left"
   },
   "https://www.acmicpc.net/problem": {
@@ -27,6 +28,14 @@ const base_urls: { [key:string]: UrlData } = {
       "navselector": ".page-header"
   }
 };
+const swalWithBootstrapButtons = Swal.mixin({
+  customClass: {
+    confirmButton: 'btn btn-success',
+    cancelButton: 'btn btn-danger'
+  },
+  buttonsStyling: false
+});
+
 type FormElements = HTMLElement | null;
 class FormGenerator {
   private data: UrlData;
@@ -36,16 +45,14 @@ class FormGenerator {
   private input_tag_m: HTMLInputElement;
   private input_tag_s: HTMLInputElement;
   private input_arr: Array<HTMLElement>;
-  private formTag: HTMLFormElement;
   private starImg: HTMLImageElement;
   private inputWrapper: HTMLDivElement;
   private actionButton: HTMLButtonElement;
-  private timer: Timer;
+  private timer: TimerImpl;
   
-  constructor(timer: Timer) {
+  constructor(timer: TimerImpl) {
     this.data = this.getSiteData(location.href);
     this.top_nav = null;
-    this.formTag = this.generateTag('timer-form','form') as HTMLFormElement;
     this.inputWrapper = this.generateTag('input-wrapper','div') as HTMLDivElement;
     this.starImg = this.generateTag('star-img','img') as HTMLImageElement;
     this.input_tag_h = this.generateTag('input-h','input') as HTMLInputElement;
@@ -82,17 +89,18 @@ class FormGenerator {
     this.setTagStyles();
     this.setEventListener();
     this.setMutation();
+    this.timer.requestPermission();
   }
   private appendTags(): void{
     // appendchild
     const targetDiv = document.querySelector(this.data.navselector);
-    targetDiv?.append(this.clock);
-    targetDiv?.appendChild(this.formTag);
-    this.formTag.appendChild(this.inputWrapper);
+    // targetDiv?.append(this.clock);
+    targetDiv?.appendChild(this.inputWrapper);
     this.inputWrapper.appendChild(this.starImg);
     this.inputWrapper.appendChild(this.input_tag_h);
     this.inputWrapper.appendChild(this.input_tag_m);
     this.inputWrapper.appendChild(this.input_tag_s);
+    this.inputWrapper.appendChild(this.clock);
     this.inputWrapper.appendChild(this.actionButton);
   }
   private setTagStyles(): void{
@@ -137,19 +145,30 @@ class FormGenerator {
   }
   private setMutation(): void{
     if(this.data["url"] === "https://www.hackerrank.com/"){ // 특정 위치에 원소 삽입
-        const mutation = new MutationObserver(()=>{
-            this.top_nav = document.querySelector(this.data['navselector']);
-            if (this.top_nav) {
-                this.top_nav.appendChild(this.inputWrapper);
-                this.input_tag_h.focus();
-                this.isFavor().then(result=> this.checkStar(result));
-                // this.checkStar(this.isFavor());
-                mutation.disconnect();
-            } else {
-                console.log('시도중...');
-            }
-        });
-        mutation.observe(document.getElementsByClassName('.hr-monaco-editor-wrapper')[0],{childList:true});
+        const interval = setInterval(()=>{
+          this.top_nav = document.querySelector(this.data.navselector);
+          if(this.top_nav) {
+            this.top_nav.appendChild(this.inputWrapper);
+            this.input_tag_h.focus();
+            this.isFavor().then(result=> this.checkStar(result));
+            clearInterval(interval);
+          } else {
+            console.log('시도중...');
+          }
+        },1000); 
+        // const mutation = new MutationObserver(()=>{
+        //     this.top_nav = document.querySelector(this.data['navselector']);
+        //     if (this.top_nav) {
+        //         this.top_nav.appendChild(this.inputWrapper);
+        //         this.input_tag_h.focus();
+        //         this.isFavor().then(result=> this.checkStar(result));
+        //         // this.checkStar(this.isFavor());
+        //         mutation.disconnect();
+        //     } else {
+        //         console.log('시도중...');
+        //     }
+        // });
+        // mutation.observe(document.querySelectorAll('.hr-monaco-editor-wrapper')[0],{childList:true});
     }else {
         this.top_nav = document.querySelector(this.data['navselector']);
         this.top_nav!.appendChild(this.inputWrapper);
@@ -157,7 +176,37 @@ class FormGenerator {
         this.isFavor().then(result=> this.checkStar(result));
     }
   }
+  
+  private addUnsolvedQuestions(key: string, value: string) {
+    // const item = {key: value};  // 추가할 항목들
+    const item: any = {};
+    item[key] = value;
+    chrome.storage.sync.get(null, function (items) {
+      const keys = Object.keys(items);
+      if (!keys.includes(key)) {
+        chrome.storage.sync.set(item, function () {
+          
+        });
+      }
+    });
+  }
+  // function addUnsolvedQuestions(key, value) {
+  //   let item = {};  // 추가할 항목들
+  //   item[key] = value;
+  //   chrome.storage.sync.get(null, function (items) {
+  //       const keys = Object.keys(items);
+  //       if (!keys.includes(key)) {
+  //           chrome.storage.sync.set(item, function () {
+
+  //           });
+  //       }
+  //   });
+  // }
+  private removeUnStaredQuestion(title: string) {
+    chrome.storage.sync.remove(title);
+  }
   private setEventListener(): void{
+    // starImg event
     this.starImg.addEventListener("click", () => {
       const url = window.location.href;
       const title = document.querySelector(this.data.titleselector)!.textContent;
@@ -165,33 +214,102 @@ class FormGenerator {
       if (this.starImg.alt === "unstar") {
           this.starImg.alt = "star";
           this.starImg.src = chrome.runtime.getURL("img/Star.png?time=") + new Date().getTime();
-          // addUnsolvedQuestions(title, url);
+          this.addUnsolvedQuestions(title!, url);
       } else {
           this.starImg.alt = "unstar";
           this.starImg.src = chrome.runtime.getURL("img/unStar.png?time=") + new Date().getTime();
           // remove from list
-          // removeUnStaredQuestion(title);
+          this.removeUnStaredQuestion(title!);
       }
     });
-    this.actionButton.addEventListener("click", () => {
-      if(this.validation()){
-        this.hideInputForms();
-        this.timer.start();  
-      } else {
-        
+    // actionButton event
+    this.actionButton.addEventListener("click", (e) => {
+      if((e.target as HTMLButtonElement).innerText === '시작'){
+        if(this.validation()){
+          this.hideInputForms();
+          this.showClock();
+          this.actionButton.innerText = '중지';
+
+          const h = parseInt(this.input_tag_h.value);
+          const m = parseInt(this.input_tag_m.value);
+          const s = parseInt(this.input_tag_s.value);
+
+          this.timer.setTime(h,m,s);
+          this.timer.start(false);
+          this.resetInput(); 
+        } else { // 비정상적 값이 입력된 경우
+          Swal.fire({
+            icon: 'error',
+            title: '앗!',
+            text: '정상적인 값을 입력해주세요',
+          });
+        }
+      } else if((e.target as HTMLButtonElement).innerText === '재개') {
+        this.timer.start(true);
+        this.actionButton.innerText = '중지';
+      } else { // 중지
+        Swal.fire({
+          title: "타이머가 실행중입니다.",
+          showDenyButton: true,
+          showCancelButton: true,
+          cancelButtonText: '취소',
+          confirmButtonText: '일지정지',
+          denyButtonText: '초기화',
+        }).then((result)=>{
+          if(result.isConfirmed) {
+            this.timer.pause();
+            this.actionButton.innerText = '재개';
+          } else if (result.isDenied) {
+            Swal.fire(
+              '초기화 됨',
+              '타이머가 초기화 되었습니다!',
+              'success'
+            )
+            this.timer.stop();
+            this.resetInput();
+            this.hideClock();
+            this.showInputForm();
+            this.actionButton.innerText = '시작';
+            this.input_tag_h.focus();
+          }
+        }); 
       }
     });
+    // input event
+    this.input_arr.forEach(input => {
+      input.addEventListener('keyup',(e: KeyboardEvent)=>{
+        if(e.code == 'Enter') this.actionButton.click();
+      });
+    });
+  }
+  private resetInput(): void{
+    this.input_tag_h.value = '';
+    this.input_tag_m.value = '';
+    this.input_tag_s.value = '';
   }
   private validation(): boolean{
       return this.input_arr.reduce((acc, cur) => acc && (this.isNumber((cur as HTMLInputElement).value) || (cur as HTMLInputElement).value === "")
-      , this.isNumber((this.input_arr[0] as HTMLInputElement).value));
+      , this.isNumber((this.input_arr[0] as HTMLInputElement).value) || (this.input_arr[0] as HTMLInputElement).value === '');
   }
   private isNumber(num: string): boolean{
     const regex = /^[0-9]+$/;
     return regex.test(num);
   }
   private hideInputForms(): void{
-
+    this.input_tag_h.style.display = 'none';
+    this.input_tag_m.style.display = 'none';
+    this.input_tag_s.style.display = 'none';
+  }
+  private showInputForm(): void{
+    this.input_tag_h.style.display = 'block';
+    this.input_tag_m.style.display = 'block';
+    this.input_tag_s.style.display = 'block';
+  }
+  private hideClock(): void{
+    this.clock.style.display = 'none';
+  }
+  private showClock(): void{
+    this.clock.style.display = 'block';
   }
   private checkStar(check: boolean): void{
     if (check) {
@@ -206,7 +324,7 @@ class FormGenerator {
   }
   private isFavor(): Promise<boolean>{
     return new Promise(resolve => {
-      if(document.querySelector(this.data.titleselector) == null){
+      if(document.querySelector(this.data.titleselector) !== null){
         const title = document.querySelector(this.data.titleselector)!.textContent;
 
         chrome.storage.sync.get(null, function (items) {
