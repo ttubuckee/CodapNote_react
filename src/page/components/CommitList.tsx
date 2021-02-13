@@ -1,21 +1,37 @@
 import React ,{useEffect,useState} from 'react';
 import axios from 'axios';
+import {GITHUB_USER_KEY, GITHUB_PERSONAL_KEY} from '../../generalData';
 
 const CommitList = () => {
   const [list,setList] = useState('');
+  const [commitCount,setCommitCount] = useState(0);
   const [userName,setUserName] = useState('');
 
   useEffect(()=>{
-    // axios.post('https://api.github.com/graphql')
-    chrome.storage.sync.get('CODAPNOTE_USER_ID',(data)=>{
-      axios.get(`https://api.github.com/users/${data['CODAPNOTE_USER_ID']}/repos`)
-      .then( res => {
-        setUserName(JSON.stringify(res.data[0].name));
-      });  
+    chrome.storage.sync.get([GITHUB_USER_KEY!,GITHUB_PERSONAL_KEY],(data)=>{
+      axios.get(`https://api.github.com/search/commits?q=author:${data[GITHUB_USER_KEY]}+author-date:${new Date().toJSON().slice(0,10)}`,{
+        headers: {
+          Accept: 'application/vnd.github.cloak-preview',
+          Authorization: `token ${data[GITHUB_PERSONAL_KEY]}`
+        }
+      }).then( res => {
+        // console.log(res.data.total_count);
+        setCommitCount(parseInt(res.data.total_count));
+        setUserName(data[GITHUB_USER_KEY]);
+      })
+      // axios.get(`https://api.github.com/users/${data[GITHUB_USER_KEY!]}/repos`)
+      // .then( res => {
+      //   setUserName(JSON.stringify(res.data[0].name));
+      // });
     });
   },[]);
   
-return (<div>{userName}</div>);
+return (<div>{
+    commitCount
+? <span>금일 커밋 수는 {commitCount} 입니다.</span>
+: <span>아직 커밋 내역이 없습니다.</span>
+  }
+  </div>);
 }
 
 export default CommitList;

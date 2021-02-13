@@ -1,10 +1,58 @@
 import FormGenerator from './components/FormGenerator';
 import TimerImpl from './components/TimerImpl';
 import Swal from 'sweetalert2';
+import {GITHUB_USER_KEY, GITHUB_PERSONAL_KEY} from './generalData';
+
 // 타이머
 // 폼 데이터 삽입
 // 데이터 popup.html에 리스트 추가
 // 즐겨찾기
+
+const setGithub = () => {
+  Swal.mixin({
+    input: 'text',
+    confirmButtonText: '다음',
+    showCancelButton: true,
+    progressSteps: ['1', '2']
+  }).queue([
+    {
+      title: '사용자 정보 등록',
+      text: 'author 정보를 입력해주세요'
+    },
+    {
+      title: '사용자 정보 등록',
+      text: 'GitHub Personal Key 정보를 입력해주세요(내부 DB에 저장됩니다.)'
+    }
+  ]).then((result: any) => {
+    if (result.value) {
+      if(result.value.some((element: any) => { // 영문,숫자 이외의 문자가 섞여있을 경우
+        return !/^[0-9a-zA-Z]+$/.test(element);
+      })){
+        Swal.fire({
+          title: '영문, 숫자 조합만 입력해주세요.',
+          html: `
+            <div>author: ${result.value[0]}</div><div>personal-key: ${result.value[1]}</div>
+          `,
+          confirmButtonText: '확인'
+        })
+      } else {
+        Swal.fire({
+          title: '성공적으로 저장되었습니다.',
+          html: `
+            <div>author: ${result.value[0]}</div><div>personal-key: ${result.value[1]}</div>
+          `,
+          confirmButtonText: '확인'
+        });
+        const items: any = {};
+        items[GITHUB_USER_KEY] = result.value[0];
+        items[GITHUB_PERSONAL_KEY] = result.value[1];
+        return chrome.storage.sync.set(items,()=>{
+          
+        })
+      }
+    }
+  })
+}
 const setId = () => {
   Swal.fire({
     title: 'Submit your Github username',
@@ -21,6 +69,7 @@ const setId = () => {
         if(!/^[0-9a-zA-Z]+$/.test(id)) throw new Error('특수문자');
         const item: any = {};
         item['CODAPNOTE_USER_ID'] = id;
+        // item[GITHUB_USER_KEY!] = id;
         return chrome.storage.sync.set(item,()=>{
           
         })
@@ -56,7 +105,8 @@ const addGitHubButton = () => {
     function(request, sender, sendResponse) {
         if(request.message === 'showPopUp') {
           // console.log('message arrived');
-          setId();
+          // setId();
+          setGithub();
           sendResponse({ok:"success"});
         }
     }
