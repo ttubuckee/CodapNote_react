@@ -30,6 +30,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@octokit/core": "^3.2.5",
     "@sweetalert2/themes": "^4.0.2",
     "axios": "^0.18.1",
     "react": "^16.14.0",
