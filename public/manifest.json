@@ -28,7 +28,8 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://programmers.co.kr/learn/courses/30/lessons/*","https://www.hackerrank.com/challenges/*","https://www.acmicpc.net/problem/*"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle",
       "js": [
         "content.js"
       ]

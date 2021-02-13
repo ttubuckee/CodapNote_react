@@ -25,6 +25,9 @@ html, body {
   color: white;
   white-space: pre;
 }
+#setting-wrapper {
+  cursor: pointer;
+}
 #navBar {
   width: 85%;
   padding: 0 7.5%;
@@ -89,6 +92,7 @@ button {
   background-color: #0078FF;
   color: white;
   font-weight: bold;
+  cursor: pointer;
 }
 .btn-wrapper {
   margin: 1em 10px 10px 0px;

@@ -22,7 +22,11 @@ const SettingHeader = ({text}: SettingHeaderProps) => {
     });
   }
   return (
-  <div id="setting"><span onClick={showPopUp}>GitHub </span> {userName}</div>
+  <div id="setting">
+    <div id="setting-wrapper" onClick={showPopUp}>
+      <span>GitHub </span> {userName}
+    </div>
+  </div>
   )
 };
 export default SettingHeader;
