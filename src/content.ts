@@ -50,6 +50,18 @@ const regs = [
 // manifest에서 document_start를 쓰면 document에서 css만 로드된 시점이고, 어떤 dom element들도 로드되지 않은 상태이기 때문에 document_idle을 스크립트 실행시점으로 주입해주었다.
 // histroy.popstate 이벤트를 감지하기 위해서 url의 변경마다 mutation을 달아줬다.
 
+const addGitHubButton = () => {
+  // github 등록
+  chrome.runtime.onMessage.addListener(
+    function(request, sender, sendResponse) {
+        if(request.message === 'showPopUp') {
+          // console.log('message arrived');
+          setId();
+          sendResponse({ok:"success"});
+        }
+    }
+  );
+}
 let oldHref = document.location.href;
 
 window.onload = function () {
@@ -68,17 +80,7 @@ window.onload = function () {
                     const timer = new TimerImpl();
                     const formGenerator = new FormGenerator(timer);
                     formGenerator.init();
-
-                    // github 등록
-                    chrome.runtime.onMessage.addListener(
-                      function(request, sender, sendResponse) {
-                          if(request.message === 'showPopUp') {
-                            // console.log('message arrived');
-                            setId();
-                            sendResponse({ok:"success"});
-                          }
-                      }
-                    );
+                    addGitHubButton();
                   }
               }
           });
@@ -89,4 +91,5 @@ window.onload = function () {
     };
     observer.observe(bodyList!, config);
   }
+  addGitHubButton();
 };
