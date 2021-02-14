@@ -1,6 +1,6 @@
 import React ,{useEffect,useState} from 'react';
 import axios from 'axios';
-import {GITHUB_USER_KEY, GITHUB_PERSONAL_KEY} from '../../generalData';
+import {GITHUB_USER_KEY, GITHUB_PERSONAL_KEY,addGitHubButton} from '../../generalData';
 
 const CommitList = () => {
   const [list,setList] = useState('');
@@ -18,6 +18,7 @@ const CommitList = () => {
         setCommitCount(parseInt(res.data.total_count));
         setUserName(data[GITHUB_USER_KEY]);
       })
+      addGitHubButton();
       // axios.get(`https://api.github.com/users/${data[GITHUB_USER_KEY!]}/repos`)
       // .then( res => {
       //   setUserName(JSON.stringify(res.data[0].name));

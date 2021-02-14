@@ -10,7 +10,6 @@ export const addGitHubButton = () => {
   chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if(request.message === 'showPopUp') {
-          // setId();
           setGithub();
           sendResponse({ok:"success"});
         }
