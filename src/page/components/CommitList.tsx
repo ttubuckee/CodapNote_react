@@ -9,13 +9,12 @@ const CommitList = () => {
 
   useEffect(()=>{
     chrome.storage.sync.get([GITHUB_USER_KEY!,GITHUB_PERSONAL_KEY],(data)=>{
-      axios.get(`https://api.github.com/search/commits?q=author:${data[GITHUB_USER_KEY]}+author-date:${new Date().toJSON().slice(0,10)}`,{
+      axios.get(`https://api.github.com/search/commits?q=author:${data[GITHUB_USER_KEY]}+committer-date:${new Date().toJSON().slice(0,10)}`,{
         headers: {
           Accept: 'application/vnd.github.cloak-preview',
           Authorization: `token ${data[GITHUB_PERSONAL_KEY]}`
         }
       }).then( res => {
-        // console.log(res.data.total_count);
         setCommitCount(parseInt(res.data.total_count));
         setUserName(data[GITHUB_USER_KEY]);
       })

@@ -24,7 +24,7 @@ const SettingHeader = ({text}: SettingHeaderProps) => {
   return (
   <div id="setting">
     <div id="setting-wrapper" onClick={showPopUp}>
-      <span>GitHub </span> {userName}
+      <span>GitHub</span> {userName}
     </div>
   </div>
   )
