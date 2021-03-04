@@ -10,6 +10,7 @@ const CommitList = () => {
   useEffect(()=>{
     chrome.storage.sync.get([GITHUB_USER_KEY!,GITHUB_PERSONAL_KEY],(data)=>{
       axios.get(`https://api.github.com/search/commits?q=author:${data[GITHUB_USER_KEY]}+committer-date:${new Date().toJSON().slice(0,10)}`,{
+        // https://stackoverflow.com/questions/46855484/checking-if-a-user-made-a-commit-to-github-using-api-on-a-given-day/46855913 참고
         headers: {
           Accept: 'application/vnd.github.cloak-preview',
           Authorization: `token ${data[GITHUB_PERSONAL_KEY]}`
