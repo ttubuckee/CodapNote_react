@@ -1,6 +1,6 @@
 <h2 align="middle">⏱ CodapNote</h2>
 <p align="middle">
-  A Coding Test Timer tool for Chrome extensions
+  A Coding Test Timer Chrome Extension tool for Chrome Browser
 </p>
 <p align="middle">
   <img src="./res/img1.gif"/>
@@ -10,12 +10,13 @@
 </p>
 
 ## Installation
+```shell
+$ git clone https://github.com/ttubuckee/CodapNote_react  
+$ cd CodapNote_react  
+$ npm install  
+$ npm run build  
 
-$ git clone https://github.com/ttubuckee/CodapNote_react
-$ cd CodapNote_react
-$ npm install
-$ npm run build
-
+ 
 Open Chrome Browser  
 Go to chrome://extensions page  
 Enable developer mode  
