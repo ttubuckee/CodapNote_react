@@ -5,7 +5,7 @@ export interface UrlData {
   navselector: string;
 }
 export const urlReg = [
-  /^https:\/\/programmers.co.kr\/learn\/courses\/30\/lessons\/\d{0,}#?$/,
+  /^https:\/\/programmers.co.kr\/learn\/courses\/30\/lessons\/\d*(\?language=(javascript|cpp|java|python3|ruby|swift))?$/,
   /^https:\/\/www.acmicpc.net\/problem\/+\d{0,}$/
 ]
 export const urlDataObj: { [key:string]: UrlData } = {
