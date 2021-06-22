@@ -16,11 +16,11 @@ $ cd CodapNote_react
 $ npm install
 $ npm run build
 
-Open Chrome Browser
-Go to chrome://extensions page
-Enable developer mode
-Click 'Load Unpacked'
-Select ./dist folder
+Open Chrome Browser  
+Go to chrome://extensions page  
+Enable developer mode  
+Click 'Load Unpacked'  
+Select ./dist folder  
 ```
 
 ## Usage
