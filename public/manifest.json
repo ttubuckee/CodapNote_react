@@ -1,0 +1,42 @@
+{
+  "name": "코답노트 (프로그래머스/백준/해커랭크 문제풀이 확장앱)",
+  "description":"코답노트 - 프로그래머스/백준/해커랭크 문제 풀이 타이머, 오답노트 기능 제공",
+  "manifest_version": 2,
+  "version": "0.0.5",
+  "icons": {
+    "16": "img/timer_icon.png",
+    "48": "img/timer_icon.png",
+    "128": "img/timer_icon.png"
+  },
+  "browser_action": {
+    "default_icon": "img/timer_icon.png",
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [
+    "img/*.png"
+  ],
+  "permissions": [
+    "storage",
+    "notifications",
+    "tabs"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "run_at": "document_idle",
+      "css": ["content.css"],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "chrome_url_overrides": {
+    "newtab": "page.html"
+  }
+}
