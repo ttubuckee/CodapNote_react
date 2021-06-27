@@ -1,4 +1,4 @@
-<h2 align="middle">⏱ CodapNote</h2>
+# ⏱ CodapNote ![CodeFactor](https://www.codefactor.io/repository/github/ttubuckee/CodapNote_react/badge)
 <p align="middle">
   A Coding Test Timer Chrome Extension tool for Chrome Browser
 </p>
