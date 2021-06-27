@@ -4,8 +4,8 @@ code {
 }
 
 html, body {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   width: 250px;
   background-color: #263747;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -17,7 +17,7 @@ html, body {
 #setting {
   width: 85%;
   height: 2.5em;
-  padding: 3% 7.5% 0 7.5%;
+  padding: 3% 7.5% 0;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -30,7 +30,7 @@ html, body {
 }
 #navBar {
   width: 85%;
-  padding: 4.5% 7.5% 0 7.5%;
+  padding: 4.5% 7.5% 0;
   height: 2em;
   display: flex;
   flex-direction: row;
@@ -95,7 +95,7 @@ button {
   cursor: pointer;
 }
 .btn-wrapper {
-  margin: 1em 10px 10px 0px;
+  margin: 1em 10px 10px 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
