@@ -127,7 +127,7 @@ export class TimerViewImpl implements TimerView {
     const m = this.model.minute;
     const s = this.model.second;
     
-    this.clock!.innerText 
+    this.clock!.innerText
     = (h < 10 ? '0'+h : h) + ' : '
     + (m < 10 ? '0'+m : m) + ' : '
     + (s < 10 ? '0'+s : s);
@@ -238,7 +238,7 @@ export class TimerViewImpl implements TimerView {
     if(this._data["url"] === "https://www.hackerrank.com/"){ // 특정 위치에 원소 삽입
         const interval = setInterval(()=>{
           this._top_nav = document.querySelector(this.data.navselector);
-          
+
           if(this._top_nav) {
             this._top_nav.appendChild(this._inputWrapper);
             this._input_tag_h.focus();
@@ -247,7 +247,7 @@ export class TimerViewImpl implements TimerView {
           } else {
             console.log('시도중...');
           }
-        },1000); 
+        },1000);
         // const cb = function(this: TimerViewImpl,mutations: Array<MutationRecord>) {
         //   mutations.forEach((mutation)=>{
         //     this._top_nav = document.querySelector(this._data['navselector']);
@@ -363,21 +363,20 @@ export class TimerViewImpl implements TimerView {
       } catch(e) {
         console.log(e);
         resolve(false);
-      } 
+      }
     });
   }
-  private generateTag(id: string,type: string): HTMLElement{ 
+  private generateTag(id: string,type: string): HTMLElement{
     const tag = document.createElement(type);
     tag.setAttribute('id',id);
     return tag;
   }
-  private getSiteData(url: string): UrlData {  
+  private getSiteData(url: string): UrlData {
     for(let obj in urlDataObj) { // url 매칭 검사
-      if(url.includes(obj)) { 
+      if(url.includes(obj)) {
         return urlDataObj[obj];
       }
     }
     throw new Error('wrong access');
   }
 }
-
