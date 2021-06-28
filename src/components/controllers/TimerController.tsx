@@ -51,12 +51,12 @@ export class TimerControllerImpl implements TimerController {
           const time = this._view.input_arr.map(e=>{
             const { value } = (e as HTMLInputElement);
             
-            return value ? parseInt(value) : 0;
+            return value ? parseInt(value,10) : 0;
           });
         
           this._model.setTime(...time);
           this._view.start();
-          this._view.resetInput(); 
+          this._view.resetInput();
         } else { // 비정상적 값이 입력된 경우
           Swal.fire({
             icon: 'error',
@@ -87,7 +87,7 @@ export class TimerControllerImpl implements TimerController {
             this._view.stop();
             this._view.input_tag_h.focus();
           }
-        }); 
+        });
       }
     });
     // input event

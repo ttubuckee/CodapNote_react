@@ -58,7 +58,7 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
       setCount(count-1);
     }
   }
-  const selectAll = () => { 
+  const selectAll = () => {
     const btn = document.getElementById("select-all-btn") as HTMLButtonElement;
     const check_item = document.querySelectorAll('.check-item');
 
@@ -71,7 +71,7 @@ function ContentList({id, currentTab, siteList}: ContentListProps) {
     } else {
       btn.innerHTML = "모두 해제";
       check_item.forEach(e => (e as HTMLInputElement).checked = true);
-      
+
       setCount(document.getElementById('unsolved-list')!.children.length);
       setIsAllSelected(true);
     }
