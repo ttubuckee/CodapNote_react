@@ -17,8 +17,7 @@
   ],
   "permissions": [
     "storage",
-    "notifications",
-    "tabs"
+    "notifications"
   ],
   "background": {
     "scripts": [
@@ -35,8 +34,5 @@
         "content.js"
       ]
     }
-  ],
-  "chrome_url_overrides": {
-    "newtab": "page.html"
-  }
+  ]
 }
